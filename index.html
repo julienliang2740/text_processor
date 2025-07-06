@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>TXT Uploader</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; max-width: 500px; margin: auto; }
+    #result { margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Upload a Text File</h1>
+  <input type="file" id="fileInput" accept=".txt" />
+  <button id="uploadBtn">Upload & Process</button>
+  <div id="result"></div>
+
+  <script>
+    document.getElementById('uploadBtn').onclick = () => {
+      const file = document.getElementById('fileInput').files[0];
+      if (!file) return alert('Please choose a .txt file first.');
+      const fd = new FormData();
+      fd.append('file', file);
+
+      fetch('http://localhost:5000/process', { method: 'POST', body: fd })
+        .then(res => res.json())
+        .then(data => {
+          if (data.error) throw new Error(data.error);
+          document.getElementById('result').innerHTML =
+            `<p><strong>Filename:</strong> ${data.filename}</p>
+             <p><strong>Word count:</strong> ${data.word_count}</p>`;
+        })
+        .catch(err => {
+          document.getElementById('result').textContent = 'Error: ' + err.message;
+        });
+    };
+  </script>
+</body>
+</html>
